@@ -74,7 +74,7 @@ trait DefaultHandlers {this: ScriptExecutor[_] with Tracer =>
                                                         insert(CAActivated   (n,null))
                                                         insert(CAActivatedTBD(n))
                                                       }
-           case n@Script                       (t) => activateFrom(n, t.child0)   // ???????????
+           case n@Script                       (t, _*) => activateFrom(n, t.child0)   // ???????????
       }      
   }
   
@@ -637,19 +637,21 @@ trait DefaultHandlers {this: ScriptExecutor[_] with Tracer =>
     
     message.node.activationMode = ActivationMode.Active
     
+    // ??? is this right ???
+    def actNext = !(activationEnded || activationEndedOptionally)
     if (n.hadFullBreak) activationEnded = true
     else if (nextActivationTemplateIndex==message.node.template.children.size) {
       if (message.node.isIteration) {
         nextActivationTemplateIndex = 0
         nextActivationPass += 1
-        activateNext = true
+        activateNext = actNext
       }
       else {
         activationEnded = true
       }
     }
     else {
-      activateNext = true
+      activateNext = actNext
     }  
     }
     
@@ -714,7 +716,7 @@ trait DefaultHandlers {this: ScriptExecutor[_] with Tracer =>
     if (nodesToBeSuspended!=null) nodesToBeSuspended.foreach((n) => insert(Suspend(n)))
 
     // do activation    
-    
+    if (isSequential) activateNext = activateNext && n.children.isEmpty
     if (activateNext) {
       val t = message.node.template.children(nextActivationTemplateIndex)
       activateFrom(message.node, t, Some(nextActivationPass))

@@ -637,28 +637,22 @@ class GraphicalDebuggerApp extends SimpleSubscriptApplication with MsgListener {
     orderedMessages.foreach(msgQueueListModel.addElement(_)) 
   }
   def updateDisplay = {
-    println("updStart")
     var s = if (currentMessage==null) "." else currentMessage.toString
     if (s.length>50) s = s.substring(0, 50) + "..."
     currentMessageTF.text = s
     logMessage (">>", currentMessage)
     callGraphPanel    .repaint()
     templateTreesPanel.repaint()
-    println("updEnd")
   }
   def doesThisAllowToBeDebugged = false
   override def live = _execute(_live, doesThisAllowToBeDebugged) 
   
   def script..
-     live       = {println("A")}
-                  {*awaitMessageBeingHandled(true)*}
-                  {println("B")}
+     live       = {*awaitMessageBeingHandled(true)*}
                   ( if shouldStep then @{gui(there)}: {!updateDisplay!} stepCommand
                                     || if autoCheckBox.selected then {*waitForStepTimeout*} else (-)
                   )
-                  {println("C")}
                   {messageBeingHandled(false)}
-                  {println("D\n")}
                   ... // TBD: parsing goes wrong without this comment; lineStartOffset was incremented unexpectedly
                || exitDebugger
   
