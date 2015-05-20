@@ -12,6 +12,9 @@ SuperSabbus for Scala core, builds the scala library and compiler. It can also p
 <!-- HINTS
  - for faster builds, have a build.properties in the same directory as build.xml that says:
       locker.skip=1
+
+  Publish command:
+  ant publish-signed -Dpassphrase=YOUR_PASSPHRASE -Dbuild.release=1
 -->
 
 <!-- USAGE FROM JENKINS SCRIPTS IS (CURRENTLY) AS FOLLOWS:
